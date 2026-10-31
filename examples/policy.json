@@ -1,0 +1,8 @@
+{
+  "network": "testnet",
+  "account": "guest-book.testnet",
+  "publicKey": "ed25519:FnF8jNEV5uLJAdTLLs1iCBhzCQi7QrVzghvWXwfc5KxS",
+  "receiver": "dev-1596077379254-2809613",
+  "methods": ["add_message"],
+  "maxAllowanceYocto": "10000000000000000000000"
+}

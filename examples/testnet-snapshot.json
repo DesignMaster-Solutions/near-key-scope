@@ -1,0 +1,91 @@
+{
+  "network": "testnet",
+  "account": "guest-book.testnet",
+  "endpoint": "https://rpc.testnet.near.org",
+  "fetchedAt": "2026-10-31T17:23:13.385Z",
+  "rpc": {
+    "jsonrpc": "2.0",
+    "result": {
+      "block_hash": "B9xGNatKjXbLq9u5j821hB83jRwKUeVVSUTCqAmqQn1T",
+      "block_height": 275629817,
+      "keys": [
+        {
+          "access_key": {
+            "nonce": 0,
+            "permission": "FullAccess"
+          },
+          "public_key": "ed25519:2nnxJ1zYdTxUHkfLbFfDoPBrrEm2ad3QbPUYRKeNBQja"
+        },
+        {
+          "access_key": {
+            "nonce": 6,
+            "permission": "FullAccess"
+          },
+          "public_key": "ed25519:7uJ5F36ygUzbEzmuxcrJSqWqcHTaE4Hxjz8pBWMhKgfy"
+        },
+        {
+          "access_key": {
+            "nonce": 1,
+            "permission": "FullAccess"
+          },
+          "public_key": "ed25519:8DNRDKE4JDoktQAcrDh5rh2XbRDGDsbULcNDqpTTG7Rv"
+        },
+        {
+          "access_key": {
+            "nonce": 6,
+            "permission": "FullAccess"
+          },
+          "public_key": "ed25519:8e5NqNH11JXREfckyUF2v3N9vt8hMAaESB5MxqmJCcxf"
+        },
+        {
+          "access_key": {
+            "nonce": 1,
+            "permission": "FullAccess"
+          },
+          "public_key": "ed25519:ELq5dTurUdsk3dzbj7W6LpiFAwV95sbtUFHx44B6pQW8"
+        },
+        {
+          "access_key": {
+            "nonce": 7,
+            "permission": "FullAccess"
+          },
+          "public_key": "ed25519:EgHAiUE9gBuSHYmXGRtSLQWuMCNW1s74PKd4oSLgUTmC"
+        },
+        {
+          "access_key": {
+            "nonce": 0,
+            "permission": "FullAccess"
+          },
+          "public_key": "ed25519:FXvpckaXCBgCcSxAvH9aSnqBHoGDa3ZnVYf6AcoPreqK"
+        },
+        {
+          "access_key": {
+            "nonce": 0,
+            "permission": {
+              "FunctionCall": {
+                "allowance": "10000000000000000000000",
+                "method_names": [],
+                "receiver_id": "dev-1596077379254-2809613"
+              }
+            }
+          },
+          "public_key": "ed25519:FnF8jNEV5uLJAdTLLs1iCBhzCQi7QrVzghvWXwfc5KxS"
+        },
+        {
+          "access_key": {
+            "nonce": 3,
+            "permission": {
+              "FunctionCall": {
+                "allowance": "9999919080867603425000",
+                "method_names": [],
+                "receiver_id": "dev-1596077379254-2809613"
+              }
+            }
+          },
+          "public_key": "ed25519:Hnztp1aoQmxLm9qzZjUvRFGDCy1TCR9x3qynGMMXaz7D"
+        }
+      ]
+    },
+    "id": "key-scope"
+  }
+}
