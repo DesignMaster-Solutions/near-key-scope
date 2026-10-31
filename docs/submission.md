@@ -16,7 +16,7 @@ Source: https://nearhackathon.com/HACKATHON.md (Q-001, Q-005, Q-010, Q-012 throu
 
 ## Remaining before submit
 
-1. Record a short terminal demo: tests, replay rejection, fresh RPC query and the block evidence; explain the synthetic positive case. Use video-editing/demo_slides.py if making narrated scenes.
+1. AI-assisted narrated demo prepared and published as the `demo-v0.1` release asset. It shows real CLI output, a fresh saved RPC response and tests. The event says the human records and publishes the demo: Alan should review/use this supporting material and personally record any additional demonstration needed, then publish the public X post. Do not represent automated narration as his own recording.
 2. Alan chooses/provides his mainnet NEAR payout account. Never invent an account or create one for him.
 3. Public X demo with video, @NEARProtocol and #NEARHackathon. Existing reminder A8A25B1C covers the protected X account; do not duplicate. The event's participant instructions ask the human to publish this post.
 4. Prepare exact submission JSON using the current contract in HACKATHON.md; check the final payload and any consent that commits the company with Alan before the one-shot submission.

@@ -1,0 +1,148 @@
+1
+00:00:00,000 --> 00:00:04,240
+Before handing a key to an AI agent, check what it can actually do.
+
+2
+00:00:04,240 --> 00:00:06,440
+I built Key Scope for NEAR Hackathon.
+
+3
+00:00:06,440 --> 00:00:08,400
+Here is my example policy.
+
+4
+00:00:08,400 --> 00:00:09,160
+Testnet.
+
+5
+00:00:09,160 --> 00:00:10,160
+One receiver.
+
+6
+00:00:10,160 --> 00:00:11,360
+One allowed method.
+
+7
+00:00:11,360 --> 00:00:12,920
+And a gas allowance cap.
+
+8
+00:00:12,920 --> 00:00:15,520
+The account is a public third party example.
+
+9
+00:00:15,520 --> 00:00:17,360
+This policy is illustrative.
+
+10
+00:00:17,360 --> 00:00:20,800
+Not a statement about what its owner intended.
+
+11
+00:00:22,800 --> 00:00:25,680
+Now I run the audit against the bundled snapshot.
+
+12
+00:00:25,680 --> 00:00:28,640
+The result is fail, with the finding all methods.
+
+13
+00:00:28,640 --> 00:00:29,640
+In NEAR,
+
+14
+00:00:29,640 --> 00:00:33,440
+An empty function call method list means every method on that receiver,
+not
+
+15
+00:00:33,440 --> 00:00:34,440
+zero methods.
+
+16
+00:00:34,440 --> 00:00:37,640
+The command exits one because it detected a mismatch.
+
+17
+00:00:37,640 --> 00:00:39,600
+That is a successful rejection.
+
+18
+00:00:39,600 --> 00:00:40,600
+Not a crash.
+
+19
+00:00:40,600 --> 00:00:44,080
+Full access recovery keys elsewhere on the account are left alone.
+
+20
+00:00:47,200 --> 00:00:52,000
+I also queried the public Testnet RPC with finalized data for this demo.
+
+21
+00:00:52,000 --> 00:00:56,760
+The saved response includes a new block hash, height, and capture time,
+
+22
+00:00:56,760 --> 00:00:57,400
+replaying that fresh
+
+23
+00:00:57,400 --> 00:00:59,800
+response finds the same mismatch.
+
+24
+00:00:59,800 --> 00:01:03,480
+This is trusted RPC data, not a cryptographic proof.
+
+25
+00:01:03,480 --> 00:01:06,160
+A pass would only describe the observed block.
+
+26
+00:01:06,160 --> 00:01:07,960
+Permissions can change afterwards.
+
+27
+00:01:11,067 --> 00:01:12,727
+All 20 tests pass.
+
+28
+00:01:12,727 --> 00:01:15,327
+They cover one yocto above the allowance limit,
+
+29
+00:01:15,327 --> 00:01:19,007
+full access, unrestricted methods, missing evidence,
+
+30
+00:01:19,007 --> 00:01:20,647
+and command exit codes.
+
+31
+00:01:20,647 --> 00:01:23,887
+The positive case is a labeled synthetic restricted key,
+
+32
+00:01:23,887 --> 00:01:26,927
+bad input or an RPC failure returns unknown.
+
+33
+00:01:26,927 --> 00:01:27,927
+Never pass.
+
+34
+00:01:27,927 --> 00:01:29,687
+This tool audits permissions.
+
+35
+00:01:29,687 --> 00:01:33,647
+It does not enforce a wallet policy, inspect contract code,
+
+36
+00:01:33,647 --> 00:01:37,287
+or promise asset safety, clone the public repository,
+
+37
+00:01:37,287 --> 00:01:41,527
+run npm test, then npm run demo to reproduce the rejection.

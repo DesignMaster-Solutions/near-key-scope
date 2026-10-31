@@ -23,6 +23,12 @@ node cli.mjs live examples/policy.json /tmp/key-scope-fresh.json
 
 The current chain may differ from the recorded snapshot. Only `live` contacts the public RPC. `replay` is explicitly offline and is never proof of the current state.
 
+## Narrated walkthrough
+
+[Download or watch the demo video](https://github.com/DesignMaster-Solutions/near-key-scope/releases/download/demo-v0.1/key-scope-demo.mp4). AI-assisted narration demonstrates the real CLI rejection, a fresh finalized RPC capture, and all 20 tests. The video is supporting material, not a claim of hackathon submission.
+
+Reproduce the scenes with `node video/show.mjs policy`, `node video/show.mjs replay`, `node video/show.mjs capture`, and `npm test`. The capture scene replays `video/live-snapshot.json`, fetched on October 31, 2026; it is not a live network call during playback. See [video production notes](video/README.md).
+
 ## Your agent policy
 
 Copy `examples/policy.json`. Set `network` (`testnet` or `mainnet`), `account`, the exact **public** key handle, approved `receiver`, explicit `methods`, and `maxAllowanceYocto`. Unknown/missing policy fields are rejected. One NEAR is 10^24 yoctoNEAR; amounts must be decimal strings. BigInt comparisons preserve a one-yocto difference.

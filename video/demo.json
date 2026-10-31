@@ -1,0 +1,53 @@
+{
+  "brand": "Key Scope | Design Master Solutions LLC | AI-assisted demo",
+  "voice": "Samantha",
+  "rate": 174,
+  "accent": "#34d399",
+  "out": "demo-raw.mp4",
+  "scenes": [
+    {
+      "title": "One allowed method. Every method granted.",
+      "lines": [
+        "Key Scope compares a NEAR agent key with your policy.",
+        "Read-only CLI. No private key. No transaction."
+      ],
+      "mono_cmd": "node video/show.mjs policy",
+      "say": "Before handing a key to an AI agent, check what it can actually do. I built Key Scope for NEAR Hackathon. Here is my example policy: testnet, one receiver, one allowed method, and a gas allowance cap. The account is a public third party example. This policy is illustrative, not a statement about what its owner intended.",
+      "mono_cwd": ".."
+    },
+    {
+      "title": "Run the audit. See the mismatch.",
+      "lines": [
+        "The bundled snapshot is real; replay is explicitly offline."
+      ],
+      "mono_cmd": "node video/show.mjs replay",
+      "say": "Now I run the audit against the bundled snapshot. The result is fail, with the finding all methods. In NEAR, an empty function call method list means every method on that receiver, not zero methods. The command exits one because it detected a mismatch. That is a successful rejection, not a crash. Full access recovery keys elsewhere on the account are left alone.",
+      "mono_cwd": ".."
+    },
+    {
+      "title": "Fresh RPC evidence, with a block and time.",
+      "lines": [
+        "Captured directly from the public testnet RPC for this demo.",
+        "Shown below by replaying that saved response."
+      ],
+      "mono_cmd": "node video/show.mjs capture",
+      "say": "I also queried the public testnet RPC with finalized data for this demo. The saved response includes a new block hash, height, and capture time. Replaying that fresh response finds the same mismatch. This is trusted RPC data, not a cryptographic proof. A pass would only describe the observed block. Permissions can change afterwards.",
+      "mono_cwd": ".."
+    },
+    {
+      "title": "Failure is never silently approved.",
+      "lines": [
+        "20 tests: exact amounts, malformed input, RPC failure, CLI exits.",
+        "The passing key in the tests is synthetic, clearly labelled."
+      ],
+      "mono_cmd": "node --test --test-reporter=spec",
+      "mono_grep": [
+        "\u2139 tests",
+        "\u2139 pass",
+        "\u2139 fail"
+      ],
+      "say": "All twenty tests pass. They cover one yocto above the allowance limit, full access, unrestricted methods, missing evidence, and command exit codes. The positive case is a labelled synthetic restricted key. Bad input or an RPC failure returns unknown, never pass. This tool audits permissions. It does not enforce a wallet policy, inspect contract code, or promise asset safety. Clone the public repository, run npm test, then npm run demo to reproduce the rejection.",
+      "mono_cwd": ".."
+    }
+  ]
+}
