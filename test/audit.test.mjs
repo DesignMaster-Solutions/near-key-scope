@@ -5,8 +5,20 @@ const policy = {network:'testnet',account:'example.testnet',publicKey:'ed25519:e
 const good = () => ({network:'testnet',account:'example.testnet',fetchedAt:'2026-10-31T17:00:00Z',rpc:{result:{block_hash:'observed-block',block_height:123,keys:[{public_key:policy.publicKey,access_key:{nonce:0,permission:{FunctionCall:{receiver_id:'app.testnet',method_names:['add_message'],allowance:policy.maxAllowanceYocto}}}}]}}});
 const run = (change) => {const s=good(); change(s); return audit(s,policy)};
 test('restricted matching key passes at exact allowance cap',()=>assert.equal(audit(good(),policy).status,'PASS'));
+test('report exposes the observed function-call permission for review',()=>{
+  assert.deepEqual(audit(good(),policy).evidence.permission,{
+    kind:'FunctionCall',
+    receiver:'app.testnet',
+    methods:['add_message'],
+    allowanceYocto:policy.maxAllowanceYocto
+  });
+});
 test('one yocto above cap fails without floating point rounding',()=>assert.equal(run(s=>s.rpc.result.keys[0].access_key.permission.FunctionCall.allowance='10000000000000000000001').status,'FAIL'));
-test('full access is not an agent-scoped key',()=>assert.equal(run(s=>s.rpc.result.keys[0].access_key.permission='FullAccess').findings[0].code,'FULL_ACCESS'));
+test('full access is reported as the observed permission and rejected',()=>{
+  const report=run(s=>s.rpc.result.keys[0].access_key.permission='FullAccess');
+  assert.equal(report.findings[0].code,'FULL_ACCESS');
+  assert.equal(report.evidence.permission,'FullAccess');
+});
 test('empty method list means every method, not no methods',()=>assert.equal(run(s=>s.rpc.result.keys[0].access_key.permission.FunctionCall.method_names=[]).status,'FAIL'));
 test('extra method fails',()=>assert.equal(run(s=>s.rpc.result.keys[0].access_key.permission.FunctionCall.method_names.push('withdraw')).status,'FAIL'));
 test('wrong receiver fails',()=>assert.equal(run(s=>s.rpc.result.keys[0].access_key.permission.FunctionCall.receiver_id='evil.testnet').status,'FAIL'));

@@ -25,16 +25,20 @@ export function audit(snapshot, policy) {
     if (typeof r.block_hash !== 'string' || !r.block_hash || !Number.isSafeInteger(r.block_height) || r.block_height < 1 || !Array.isArray(r.keys)) throw Error('Incomplete block/key evidence');
     if (r.keys.some(k=>!isObject(k)||typeof k.public_key!=='string')) throw Error('Malformed key list');
     const matches=r.keys.filter(k=>k.public_key===policy.publicKey);
-    evidence={network:snapshot.network,account:snapshot.account,publicKey:policy.publicKey,blockHash:r.block_hash,blockHeight:r.block_height,fetchedAt:snapshot.fetchedAt};
+    evidence={network:snapshot.network,account:snapshot.account,publicKey:policy.publicKey,blockHash:r.block_hash,blockHeight:r.block_height,fetchedAt:snapshot.fetchedAt,permission:null};
     if (matches.length > 1) throw Error('Duplicate queried key');
     if (!matches.length) finding('KEY_MISSING','The selected agent key is not present.');
     else {
       const permission=matches[0].access_key?.permission;
-      if (permission==='FullAccess') finding('FULL_ACCESS','This key can transfer funds, change keys and delete the account. Do not delegate it to this agent.');
+      if (permission==='FullAccess') {
+        evidence.permission='FullAccess';
+        finding('FULL_ACCESS','This key can transfer funds, change keys and delete the account. Do not delegate it to this agent.');
+      }
       else {
         if (!isObject(permission)||Object.keys(permission).length!==1||!isObject(permission.FunctionCall)) throw Error('Unsupported key permission');
         const f=permission.FunctionCall;
         if (typeof f.receiver_id!=='string'||!names(f.method_names)||!(f.allowance===null||uint(f.allowance))) throw Error('Malformed function-call permission');
+        evidence.permission={kind:'FunctionCall',receiver:f.receiver_id,methods:[...f.method_names],allowanceYocto:f.allowance};
         if (f.receiver_id!==policy.receiver) finding('WRONG_RECEIVER','Observed contract differs from the approved contract.');
         if (!f.method_names.length) finding('ALL_METHODS','An empty method list allows EVERY method on this contract.');
         else if (f.method_names.some(m=>!policy.methods.includes(m))) finding('EXTRA_METHODS','Key allows methods outside the policy: '+f.method_names.filter(m=>!policy.methods.includes(m)).join(', '));

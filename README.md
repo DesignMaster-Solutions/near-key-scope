@@ -2,7 +2,7 @@
 
 Before giving a NEAR key to an AI agent, compare its **actual on-chain permissions** with what the owner intended. A key named "read-only agent" can still have FullAccess. A function-call key with an empty method list can call every method on its receiver.
 
-Key Scope is a working, read-only CLI. It queries finalized NEAR access keys, compares one selected key against a local policy, and emits a machine-readable verdict with the block hash, height and capture time. It never reads private keys or signs transactions.
+Key Scope is a working, read-only CLI. It queries finalized NEAR access keys, compares one selected key against a local policy, and emits a machine-readable verdict with the block hash, height, capture time, and the selected key's observed permission (FullAccess or its actual receiver, methods, and remaining gas allowance). It never reads private keys or signs transactions.
 
 ## Try it in 30 seconds
 
