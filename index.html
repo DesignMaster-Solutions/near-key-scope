@@ -87,7 +87,7 @@
       <li>Press <strong>Fill example</strong>, then <strong>Check live</strong>: you should see <strong>FAIL</strong> with <code>ALL_METHODS</code> and a fresh block height. The policy allows only <code>add_message</code>; the key on chain allows every method. (Third-party public example; the narrow policy is ours.)</li>
       <li>Press <strong>Replay recorded</strong>: the same verdict from the snapshot saved on 2026-10-31, offline. A replay is reproducibility, not proof of the current chain.</li>
       <li>Paste <code>ed25519:</code> followed by 88 characters into the key field: the page refuses it as a private key before any request is made.</li>
-      <li>Download the evidence JSON and replay it with the CLI: <code>node cli.mjs replay policy.json evidence.json</code> (same <code>audit.mjs</code> as this page).</li>
+      <li>Download the evidence JSON and replay it with the CLI: <code>node cli.mjs replay policy.json key-scope-evidence.json</code> (same <code>audit.mjs</code> as this page).</li>
     </ol>
   </section>
 </main>
