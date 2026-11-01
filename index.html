@@ -73,7 +73,7 @@
       <div class="actions">
         <button type="submit" id="go">Check live</button>
         <button type="button" class="link" id="example">Fill example</button>
-        <button type="button" class="link" id="replay">Replay recorded</button>
+        <button type="button" class="link" id="replay" title="Replay the snapshot recorded on 2026-10-31 (offline)">Replay</button>
       </div>
     </form>
   </section>
@@ -85,7 +85,7 @@
     <h2 id="judge-h">Try it in 30 seconds (judges: do X, see Y)</h2>
     <ol>
       <li>Press <strong>Fill example</strong>, then <strong>Check live</strong> (or open <a href="?demo=live">?demo=live</a>): you should see <strong>FAIL</strong> with <code>ALL_METHODS</code> and a fresh block height. The policy allows only <code>add_message</code>; the key on chain allows every method. (Third-party public example; the narrow policy is ours.)</li>
-      <li>Press <strong>Replay recorded</strong>: the same verdict from the snapshot saved on 2026-10-31, offline. A replay is reproducibility, not proof of the current chain.</li>
+      <li>Press <strong>Replay</strong>: the same verdict from the snapshot saved on 2026-10-31, offline. A replay is reproducibility, not proof of the current chain.</li>
       <li>Paste <code>ed25519:</code> followed by 88 characters into the key field: the page refuses it as a private key before any request is made.</li>
       <li>Download the evidence JSON and replay it with the CLI: <code>node cli.mjs replay policy.json key-scope-evidence.json</code> (same <code>audit.mjs</code> as this page).</li>
     </ol>
