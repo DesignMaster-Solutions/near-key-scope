@@ -14,6 +14,10 @@ Source: https://nearhackathon.com/HACKATHON.md (Q-001, Q-005, Q-010, Q-012 throu
 - Results by November 18 23:59 UTC. Payment within 30 days of results.
 - No advance registration; one final submission per project, not editable. Public demo and a real mainnet payout account are mandatory. No residency restriction is stated on the checked FAQ; final terms still need checking before submission.
 
+## Hosted demo (Q-012: "Hosted demo is a plus; keep it up to 2026-11-18, ideally 2026-11-25")
+
+Added 2026-11-01: https://designmaster-solutions.github.io/near-key-scope/ (GitHub Pages from `main`, static, no secrets). Same `audit.mjs` as the CLI; live check from the browser, offline replay, private-key refusal, evidence and policy download. Keep the repository and Pages up at least until 2026-11-25.
+
 ## Remaining before submit
 
 1. AI-assisted narrated demo prepared and published as the `demo-v0.1` release asset. It shows real CLI output, a fresh saved RPC response and tests. The event says the human records and publishes the demo: Alan should review/use this supporting material and personally record any additional demonstration needed, then publish the public X post. Do not represent automated narration as his own recording.
