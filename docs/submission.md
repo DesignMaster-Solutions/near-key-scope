@@ -19,7 +19,7 @@ Source: https://nearhackathon.com/HACKATHON.md (Q-001, Q-005, Q-010, Q-012 throu
 1. AI-assisted narrated demo prepared and published as the `demo-v0.1` release asset. It shows real CLI output, a fresh saved RPC response and tests. The event says the human records and publishes the demo: Alan should review/use this supporting material and personally record any additional demonstration needed, then publish the public X post. Do not represent automated narration as his own recording.
 2. Alan chooses/provides his mainnet NEAR payout account. Never invent an account or create one for him.
 3. Public X demo with video, @NEARProtocol and #NEARHackathon. Existing reminder A8A25B1C covers the protected X account; do not duplicate. The event's participant instructions ask the human to publish this post.
-4. Prepare exact submission JSON using the current contract in HACKATHON.md; check the final payload and any consent that commits the company with Alan before the one-shot submission.
+4. Payload prepared against the API contract (re-read 2026-11-01): `docs/idea.txt` is the `idea` field (1,418 chars); the full JSON lives outside the repo because it holds contact data. `node submission.mjs <payload.json>` checks every field rule without sending; today it fails only on `nearAddress`, `demoUrl` and `consent`, which are Alan's. Read him the consent text verbatim and print the final JSON before the one-shot POST.
 5. Submit inside the window and store the external receipt. Until then this stays in the construction queue.
 
 ## Suggested demo narrative (draft, not posted)
