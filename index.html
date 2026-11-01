@@ -84,7 +84,7 @@
   <section class="judge" aria-labelledby="judge-h" style="grid-column:1/-1">
     <h2 id="judge-h">Try it in 30 seconds (judges: do X, see Y)</h2>
     <ol>
-      <li>Press <strong>Fill example</strong>, then <strong>Check live</strong>: you should see <strong>FAIL</strong> with <code>ALL_METHODS</code> and a fresh block height. The policy allows only <code>add_message</code>; the key on chain allows every method. (Third-party public example; the narrow policy is ours.)</li>
+      <li>Press <strong>Fill example</strong>, then <strong>Check live</strong> (or open <a href="?demo=live">?demo=live</a>): you should see <strong>FAIL</strong> with <code>ALL_METHODS</code> and a fresh block height. The policy allows only <code>add_message</code>; the key on chain allows every method. (Third-party public example; the narrow policy is ours.)</li>
       <li>Press <strong>Replay recorded</strong>: the same verdict from the snapshot saved on 2026-10-31, offline. A replay is reproducibility, not proof of the current chain.</li>
       <li>Paste <code>ed25519:</code> followed by 88 characters into the key field: the page refuses it as a private key before any request is made.</li>
       <li>Download the evidence JSON and replay it with the CLI: <code>node cli.mjs replay policy.json key-scope-evidence.json</code> (same <code>audit.mjs</code> as this page).</li>
@@ -143,6 +143,9 @@ async function check(mode){
 $('f').addEventListener('submit',(e)=>{e.preventDefault();check('live')});
 $('example').addEventListener('click',()=>fill(EXAMPLE));
 $('replay').addEventListener('click',()=>{if(!$('account').value) fill(EXAMPLE);check('replay')});
+// Shareable proof: ?demo=live or ?demo=replay fills the public example and runs it on load.
+const demo=new URLSearchParams(location.search).get('demo');
+if(demo==='live'||demo==='replay'){fill(EXAMPLE);check(demo)}
 </script>
 </body>
 </html>

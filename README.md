@@ -8,7 +8,7 @@ Key Scope is a working, read-only CLI. It queries finalized NEAR access keys, co
 
 **https://designmaster-solutions.github.io/near-key-scope/** runs the same `audit.mjs` in your browser. Do X, see Y:
 
-1. Press **Fill example**, then **Check live**: you see **FAIL** with `ALL_METHODS` and a fresh finalized block height, fetched by your browser from the public testnet RPC.
+1. Press **Fill example**, then **Check live** (or open [`?demo=live`](https://designmaster-solutions.github.io/near-key-scope/?demo=live), which does both): you see **FAIL** with `ALL_METHODS` and a fresh finalized block height, fetched by your browser from the public testnet RPC.
 2. Press **Replay recorded**: the same verdict from the snapshot recorded on 2026-10-31, offline.
 3. Put `ed25519:` plus 88 characters in the key field and press **Check live**: the page refuses it as a private key before any request.
 4. **Download evidence JSON** and **Download policy JSON**, then `node cli.mjs replay policy.json key-scope-evidence.json`: the CLI reaches the same verdict.
