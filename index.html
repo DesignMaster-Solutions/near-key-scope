@@ -40,6 +40,11 @@
   #result.fresh{opacity:0;transform:translateY(4px)}
   @media (prefers-reduced-motion:reduce){#result{transition:none}}
   .empty{color:var(--muted)}
+  .scan{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+  .scan summary{cursor:pointer;font-weight:600;font-size:14px}
+  .scan ul{list-style:none;padding:0;margin:10px 0 0;font:13px/1.5 ui-monospace,monospace}
+  .scan li{margin:6px 0;overflow-wrap:anywhere}
+  .scan code{font-weight:700} .FULL_ACCESS,.ALL_METHODS{color:var(--fail)} .UNLIMITED_GAS{color:var(--unknown)} .SCOPED{color:var(--pass)}
   pre{background:#f1f3f7;border-radius:8px;padding:10px;overflow:auto;font-size:12px;margin:10px 0 0}
   .judge ol{margin:8px 0 0;padding-left:20px} .judge li{margin:4px 0}
   footer{color:var(--muted);font-size:13px;padding:24px 20px 40px}
@@ -85,6 +90,7 @@
     <h2 id="judge-h">Try it in 30 seconds (judges: do X, see Y)</h2>
     <ol>
       <li>Press <strong>Fill example</strong>, then <strong>Check live</strong> (or open <a href="?demo=live">?demo=live</a>): you should see <strong>FAIL</strong> with <code>ALL_METHODS</code> and a fresh block height. The policy allows only <code>add_message</code>; the key on chain allows every method. (Third-party public example; the narrow policy is ours.)</li>
+      <li>Under the verdict, open <strong>9 keys on this account</strong>: every key on the account, worst first, from the same query (7 <code>FULL_ACCESS</code>, 2 <code>ALL_METHODS</code> on the example). The key you checked is marked.</li>
       <li>Press <strong>Replay</strong>: the same verdict from the snapshot saved on 2026-10-31, offline. A replay is reproducibility, not proof of the current chain.</li>
       <li>Paste <code>ed25519:</code> followed by 88 characters into the key field: the page refuses it as a private key before any request is made.</li>
       <li>Download the evidence JSON and replay it with the CLI: <code>node cli.mjs replay policy.json key-scope-evidence.json</code> (same <code>audit.mjs</code> as this page).</li>
@@ -92,11 +98,11 @@
   </section>
 </main>
 <footer>
-  MIT · <a href="https://github.com/DesignMaster-Solutions/near-key-scope">source on GitHub</a> · same <code>audit.mjs</code> as the CLI, 32 tests · built by <a href="https://www.designmastersolutions.com/?utm_source=near-key-scope&amp;utm_medium=referral&amp;utm_campaign=site-footer">Design Master Solutions</a> for NEAR HACKATHON (AI Security &amp; Defense).
+  MIT · <a href="https://github.com/DesignMaster-Solutions/near-key-scope">source on GitHub</a> · same <code>audit.mjs</code> as the CLI, 36 tests · built by <a href="https://www.designmastersolutions.com/?utm_source=near-key-scope&amp;utm_medium=referral&amp;utm_campaign=site-footer">Design Master Solutions</a> for NEAR HACKATHON (AI Security &amp; Defense).
 </footer>
 <script type="module">
-import {audit} from './audit.mjs';
-import {policyFromForm,rpcRequest,snapshotFrom,yoctoToNear} from './web.mjs';
+import {audit,inventory} from './audit.mjs';
+import {policyFromForm,rpcRequest,snapshotFrom,yoctoToNear,scanLine} from './web.mjs';
 const $=(id)=>document.getElementById(id);
 const EXAMPLE={network:'testnet',account:'guest-book.testnet',publicKey:'ed25519:FnF8jNEV5uLJAdTLLs1iCBhzCQi7QrVzghvWXwfc5KxS',receiver:'dev-1596077379254-2809613',methods:'add_message',maxAllowanceNear:'0.01'};
 const MEANING={PASS:'Exit 0: the key fits this policy at this block.',FAIL:'Exit 1: the key can do more than this policy allows.',UNKNOWN:'Exit 2: not enough evidence or a bad policy; nothing is assumed safe.'};
@@ -112,11 +118,14 @@ function permissionText(p){
 function render(report,mode,policy,snapshot){
   const r=$('result'); r.classList.add('fresh');
   const ev=report.evidence;
+  // Same snapshot, no extra request: every key on the account, worst first (the CLI's scan).
+  const inv=snapshot?inventory(snapshot):null, line=scanLine(inv);
   const rows=ev?[['Mode',mode==='live'?'live, finalized RPC from this browser':'replay of the recorded snapshot'],['Account',ev.account+' ('+ev.network+')'],['Block height',ev.blockHeight],['Block hash',ev.blockHash],['Fetched at',ev.fetchedAt],['Observed key',ev.publicKey],['Observed permission',permissionText(ev.permission)]]:[];
   r.innerHTML=`<div class="verdict"><span class="badge ${report.status}">${report.status}</span><span class="meaning">${MEANING[report.status]}</span></div>
     <ul class="findings">${report.findings.map(f=>`<li><code>${esc(f.code)}</code> ${esc(f.message)}</li>`).join('')||'<li>No finding: the observed permission fits the policy.</li>'}</ul>
     ${rows.length?`<dl>${rows.map(([k,v])=>`<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}</dl>`:''}
     ${report.scope?`<p class="hint">${esc(report.scope)}</p>`:''}
+    ${line?`<details class="scan"><summary>${esc(line)}</summary><ul>${inv.keys.map(k=>`<li><code class="${k.risk}">${k.risk}</code> ${esc(k.publicKey)}${k.publicKey===policy.publicKey?' <strong>(the key you checked)</strong>':''}${k.receiver?`<br><span class="hint">${esc(permissionText({receiver:k.receiver,methods:k.methods,allowanceYocto:k.allowanceYocto}))}</span>`:''}</li>`).join('')}</ul><p class="hint">${esc(inv.scope)}</p></details>`:''}
     ${snapshot?`<div class="actions"><a class="link" id="dl" download="key-scope-evidence.json">Download evidence JSON</a><a class="link" id="dlp" download="policy.json">Download policy JSON</a></div>`:''}`;
   if(snapshot){
     $('dl').href=URL.createObjectURL(new Blob([JSON.stringify(snapshot,null,2)+'\n'],{type:'application/json'}));

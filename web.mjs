@@ -31,3 +31,9 @@ export function policyFromForm(f) {
   validatePolicy(policy);
   return policy;
 }
+// One line for the page: how many keys the account has and how many of each risk (zero counts left out). null when the inventory failed.
+export function scanLine(inv) {
+  if (inv?.status!=='REPORT') return null;
+  const parts=Object.entries(inv.counts).filter(([,n])=>n).map(([risk,n])=>`${n} ${risk}`);
+  return `${inv.keys.length} key${inv.keys.length===1?'':'s'} on this account${parts.length?': '+parts.join(', '):''}`;
+}

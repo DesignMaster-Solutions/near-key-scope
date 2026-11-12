@@ -9,9 +9,10 @@ Key Scope is a working, read-only CLI. It queries finalized NEAR access keys, co
 **https://designmaster-solutions.github.io/near-key-scope/** runs the same `audit.mjs` in your browser. Do X, see Y:
 
 1. Press **Fill example**, then **Check live** (or open [`?demo=live`](https://designmaster-solutions.github.io/near-key-scope/?demo=live), which does both): you see **FAIL** with `ALL_METHODS` and a fresh finalized block height, fetched by your browser from the public testnet RPC.
-2. Press **Replay**: the same verdict from the snapshot recorded on 2026-10-31, offline.
-3. Put `ed25519:` plus 88 characters in the key field and press **Check live**: the page refuses it as a private key before any request.
-4. **Download evidence JSON** and **Download policy JSON**, then `node cli.mjs replay policy.json key-scope-evidence.json`: the CLI reaches the same verdict.
+2. Under the verdict, open **9 keys on this account**: every key on the account, worst first, from the same query (7 `FULL_ACCESS`, 2 `ALL_METHODS` on the example), with the key you checked marked. It is the CLI's `scan`, with no extra request.
+3. Press **Replay**: the same verdict from the snapshot recorded on 2026-10-31, offline.
+4. Put `ed25519:` plus 88 characters in the key field and press **Check live**: the page refuses it as a private key before any request.
+5. **Download evidence JSON** and **Download policy JSON**, then `node cli.mjs replay policy.json key-scope-evidence.json`: the CLI reaches the same verdict.
 
 The page is static (GitHub Pages), makes one read-only `view_access_key_list` query with `finality: final`, and never asks for a wallet, a signature or a private key. `web.mjs` (form to policy, NEAR to yocto with BigInt, the RPC request and the snapshot) is shared with `cli.mjs` and covered by `test/web.test.mjs`.
 
@@ -86,7 +87,7 @@ Full-access owner/recovery keys elsewhere on the account are not flagged by `liv
 
 Target track: **AI Security & Defense** (`security`). New project started October 31, 2026 with Codex assistance. No pre-existing product code or third-party runtime dependencies. Not yet submitted. [Current build/submission requirements](docs/submission.md).
 
-NEAR-specific integration: finalized `query / view_access_key_list`, native FunctionCall versus FullAccess permissions, receiver and method constraints, and exact u128 yoctoNEAR gas allowances. Tests (35) cover boundary values, incorrect chain/account, unavailable evidence, command exit statuses, NEAR/yocto conversion and the private-key refusal of the hosted page. The included positive case is synthetic and labelled as such in the test; live proof currently demonstrates rejection only.
+NEAR-specific integration: finalized `query / view_access_key_list`, native FunctionCall versus FullAccess permissions, receiver and method constraints, and exact u128 yoctoNEAR gas allowances. Tests (36) cover boundary values, incorrect chain/account, unavailable evidence, command exit statuses, NEAR/yocto conversion and the private-key refusal of the hosted page. The included positive case is synthetic and labelled as such in the test; live proof currently demonstrates rejection only.
 
 ## Sources
 

@@ -44,3 +44,9 @@ test('a snapshot built in the browser audits like the recorded one',()=>{
   assert.equal(r.findings[0].code,'ALL_METHODS');
   assert.equal(r.evidence.blockHeight,recorded.rpc.result.block_height);
 });
+test('the page summarises every key of the checked account from the same snapshot, zero counts left out',async()=>{
+  const {scanLine}=await import('../web.mjs');
+  const {inventory}=await import('../audit.mjs');
+  assert.equal(scanLine(inventory(read('examples/testnet-snapshot.json'))),'9 keys on this account: 7 FULL_ACCESS, 2 ALL_METHODS');
+  assert.equal(scanLine({status:'UNKNOWN',error:'x'}),null);
+});
