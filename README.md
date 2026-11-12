@@ -34,6 +34,24 @@ node cli.mjs live examples/policy.json /tmp/key-scope-fresh.json
 
 The current chain may differ from the recorded snapshot. Only `live` contacts the public RPC. `replay` is explicitly offline and is never proof of the current state.
 
+## Scan a whole account (no policy needed)
+
+Which of the keys on this account must never be handed to an agent? Do X, see Y:
+
+```sh
+node cli.mjs scan examples/testnet-snapshot.json   # offline, the recorded snapshot
+node cli.mjs scan testnet guest-book.testnet       # one read-only RPC query, finalized block
+```
+
+Both print `"status": "REPORT"` with `"counts": {"FULL_ACCESS": 7, "ALL_METHODS": 2, "UNLIMITED_GAS": 0, "SCOPED": 0}` for the recorded snapshot (live counts follow the chain), then every key sorted worst first with its receiver, methods and remaining allowance, and the block hash and height it was read at. Exit 0 means a report was produced, not that the account is safe; exit 2 is UNKNOWN (bad arguments, RPC failure, or a permission variant this version does not know, which fails closed).
+
+- `FULL_ACCESS`: can transfer funds, change keys and delete the account. Normal for an owner, never for an agent.
+- `ALL_METHODS`: function-call key with an empty method list, so every method on its receiver.
+- `UNLIMITED_GAS`: named methods, but no key-level gas budget.
+- `SCOPED`: one receiver, named methods, finite allowance. Still check it against your policy with `live`.
+
+An account that does not exist on the chosen network returns zero keys and a `note` saying so.
+
 ## Narrated walkthrough
 
 [Download or watch the demo video](https://github.com/DesignMaster-Solutions/near-key-scope/releases/download/demo-v0.1/key-scope-demo.mp4). AI-assisted narration demonstrates the real CLI rejection, a fresh finalized RPC capture, and all 20 tests. The video is supporting material, not a claim of hackathon submission.
@@ -52,7 +70,7 @@ The allowance limits **remaining gas**, not token balances, daily spending or th
 | 1 | FAIL | FullAccess, unrestricted/extra methods, wrong receiver, unlimited/excess/exhausted allowance, or missing key |
 | 2 | UNKNOWN | Bad policy, malformed response, RPC failure, unavailable file or incomplete evidence |
 
-Full-access owner/recovery keys elsewhere on the account are not flagged: this tool evaluates only the key you identify as the agent's. It does not recommend deleting the owner's recovery key.
+Full-access owner/recovery keys elsewhere on the account are not flagged by `live`/`replay`: they evaluate only the key you identify as the agent's. To see every key at once, use `scan` below. Neither recommends deleting the owner's recovery key.
 
 ## Limits and trust boundary
 
@@ -68,7 +86,7 @@ Full-access owner/recovery keys elsewhere on the account are not flagged: this t
 
 Target track: **AI Security & Defense** (`security`). New project started October 31, 2026 with Codex assistance. No pre-existing product code or third-party runtime dependencies. Not yet submitted. [Current build/submission requirements](docs/submission.md).
 
-NEAR-specific integration: finalized `query / view_access_key_list`, native FunctionCall versus FullAccess permissions, receiver and method constraints, and exact u128 yoctoNEAR gas allowances. Tests (32) cover boundary values, incorrect chain/account, unavailable evidence, command exit statuses, NEAR/yocto conversion and the private-key refusal of the hosted page. The included positive case is synthetic and labelled as such in the test; live proof currently demonstrates rejection only.
+NEAR-specific integration: finalized `query / view_access_key_list`, native FunctionCall versus FullAccess permissions, receiver and method constraints, and exact u128 yoctoNEAR gas allowances. Tests (35) cover boundary values, incorrect chain/account, unavailable evidence, command exit statuses, NEAR/yocto conversion and the private-key refusal of the hosted page. The included positive case is synthetic and labelled as such in the test; live proof currently demonstrates rejection only.
 
 ## Sources
 

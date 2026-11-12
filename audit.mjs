@@ -52,3 +52,24 @@ export function audit(snapshot, policy) {
     return {status:'UNKNOWN',findings:[{code:'INVALID_EVIDENCE_OR_POLICY',message:e.message}],evidence};
   }
 }
+// Every key on the account, worst first: the ones an agent must never be handed. No policy needed; unknown variants fail closed.
+const RISKS=['FULL_ACCESS','ALL_METHODS','UNLIMITED_GAS','SCOPED'];
+export function inventory(snapshot) {
+  try {
+    const r=snapshot?.rpc?.result;
+    if (!isObject(snapshot)||snapshot.rpc.error||!isObject(r)||typeof r.block_hash!=='string'||!r.block_hash||!Number.isSafeInteger(r.block_height)||r.block_height<1||!Array.isArray(r.keys)) throw Error('Incomplete block/key evidence');
+    const keys=r.keys.map(k=>{
+      if (!isObject(k)||typeof k.public_key!=='string') throw Error('Malformed key list');
+      const p=k.access_key?.permission;
+      if (p==='FullAccess') return {publicKey:k.public_key,risk:'FULL_ACCESS'};
+      const f=isObject(p)&&Object.keys(p).length===1?p.FunctionCall:null;
+      if (!isObject(f)||typeof f.receiver_id!=='string'||!names(f.method_names)||!(f.allowance===null||uint(f.allowance))) throw Error('Unsupported key permission');
+      return {publicKey:k.public_key,risk:!f.method_names.length?'ALL_METHODS':f.allowance===null?'UNLIMITED_GAS':'SCOPED',receiver:f.receiver_id,methods:[...f.method_names],allowanceYocto:f.allowance};
+    }).sort((a,b)=>RISKS.indexOf(a.risk)-RISKS.indexOf(b.risk));
+    const counts=Object.fromEntries(RISKS.map(x=>[x,keys.filter(k=>k.risk===x).length]));
+    return {status:'REPORT',...(keys.length?{}:{note:'No keys: the account does not exist on this network, or it is locked.'}),counts,keys,evidence:{network:snapshot.network,account:snapshot.account,blockHash:r.block_hash,blockHeight:r.block_height,fetchedAt:snapshot.fetchedAt},
+      scope:'Key permissions only. FULL_ACCESS keys are normal for an owner; the point is never to hand one to an agent. SCOPED still needs a policy check.'};
+  } catch(e) {
+    return {status:'UNKNOWN',error:e.message};
+  }
+}
