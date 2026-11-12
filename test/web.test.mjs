@@ -50,3 +50,16 @@ test('the page summarises every key of the checked account from the same snapsho
   assert.equal(scanLine(inventory(read('examples/testnet-snapshot.json'))),'9 keys on this account: 7 FULL_ACCESS, 2 ALL_METHODS');
   assert.equal(scanLine({status:'UNKNOWN',error:'x'}),null);
 });
+test('the page scans an account with no policy: only network and account are needed, and both are validated',async()=>{
+  const {scanTarget}=await import('../web.mjs');
+  const {inventory}=await import('../audit.mjs');
+  const t=scanTarget({network:'testnet',account:' guest-book.testnet ',publicKey:'',receiver:'',methods:'',maxAllowanceNear:''});
+  assert.deepEqual(t,{network:'testnet',account:'guest-book.testnet'});
+  assert.equal(JSON.parse(rpcRequest(t).init.body).params.account_id,'guest-book.testnet');
+  const inv=inventory(snapshotFrom(t,read('examples/testnet-snapshot.json').rpc));
+  assert.equal(inv.status,'REPORT');
+  assert.equal(inv.keys.length,9);
+  assert.throws(()=>scanTarget({network:'testnet',account:''}),/Invalid account/);
+  assert.throws(()=>scanTarget({network:'testnet',account:'Bad Account'}),/Invalid account/);
+  assert.throws(()=>scanTarget({network:'__proto__',account:'a.near'}),/Unknown network/);
+});

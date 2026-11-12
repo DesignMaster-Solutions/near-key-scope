@@ -84,13 +84,14 @@
   </section>
   <section aria-labelledby="result-h">
     <h2 id="result-h">Verdict</h2>
-    <div id="result" aria-live="polite"><p class="empty">Fill your policy and press <strong>Check live</strong>, or use <strong>Fill example</strong> for the public <code>guest-book.testnet</code> key.</p></div>
+    <div id="result" aria-live="polite"><p class="empty">Fill your policy and press <strong>Check live</strong>, or use <strong>Fill example</strong> for the public <code>guest-book.testnet</code> key. Only the account filled in? <strong>Check live</strong> lists every key on it, worst first.</p></div>
   </section>
   <section class="judge" aria-labelledby="judge-h" style="grid-column:1/-1">
     <h2 id="judge-h">Try it in 30 seconds (judges: do X, see Y)</h2>
     <ol>
       <li>Press <strong>Fill example</strong>, then <strong>Check live</strong> (or open <a href="?demo=live">?demo=live</a>): you should see <strong>FAIL</strong> with <code>ALL_METHODS</code> and a fresh block height. The policy allows only <code>add_message</code>; the key on chain allows every method. (Third-party public example; the narrow policy is ours.)</li>
       <li>Under the verdict, open <strong>9 keys on this account</strong>: every key on the account, worst first, from the same query (7 <code>FULL_ACCESS</code>, 2 <code>ALL_METHODS</code> on the example). The key you checked is marked.</li>
+      <li>Clear the key field and press <strong>Check live</strong> with only the account (or open <a href="?demo=scan">?demo=scan</a>): the page lists every key on that account, worst first, with no policy and no verdict (the CLI's <code>scan</code>).</li>
       <li>Press <strong>Replay</strong>: the same verdict from the snapshot saved on 2026-10-31, offline. A replay is reproducibility, not proof of the current chain.</li>
       <li>Paste <code>ed25519:</code> followed by 88 characters into the key field: the page refuses it as a private key before any request is made.</li>
       <li>Download the evidence JSON and replay it with the CLI: <code>node cli.mjs replay policy.json key-scope-evidence.json</code> (same <code>audit.mjs</code> as this page).</li>
@@ -98,11 +99,11 @@
   </section>
 </main>
 <footer>
-  MIT · <a href="https://github.com/DesignMaster-Solutions/near-key-scope">source on GitHub</a> · same <code>audit.mjs</code> as the CLI, 36 tests · built by <a href="https://www.designmastersolutions.com/?utm_source=near-key-scope&amp;utm_medium=referral&amp;utm_campaign=site-footer">Design Master Solutions</a> for NEAR HACKATHON (AI Security &amp; Defense).
+  MIT · <a href="https://github.com/DesignMaster-Solutions/near-key-scope">source on GitHub</a> · same <code>audit.mjs</code> as the CLI, 37 tests · built by <a href="https://www.designmastersolutions.com/?utm_source=near-key-scope&amp;utm_medium=referral&amp;utm_campaign=site-footer">Design Master Solutions</a> for NEAR HACKATHON (AI Security &amp; Defense).
 </footer>
 <script type="module">
 import {audit,inventory} from './audit.mjs';
-import {policyFromForm,rpcRequest,snapshotFrom,yoctoToNear,scanLine} from './web.mjs';
+import {policyFromForm,rpcRequest,snapshotFrom,yoctoToNear,scanLine,scanTarget} from './web.mjs';
 const $=(id)=>document.getElementById(id);
 const EXAMPLE={network:'testnet',account:'guest-book.testnet',publicKey:'ed25519:FnF8jNEV5uLJAdTLLs1iCBhzCQi7QrVzghvWXwfc5KxS',receiver:'dev-1596077379254-2809613',methods:'add_message',maxAllowanceNear:'0.01'};
 const MEANING={PASS:'Exit 0: the key fits this policy at this block.',FAIL:'Exit 1: the key can do more than this policy allows.',UNKNOWN:'Exit 2: not enough evidence or a bad policy; nothing is assumed safe.'};
@@ -115,6 +116,20 @@ function permissionText(p){
   const allowance=p.allowanceYocto===null?'unlimited (null)':`${yoctoToNear(p.allowanceYocto)} NEAR (${p.allowanceYocto} yocto)`;
   return `FunctionCall · receiver ${p.receiver} · methods ${p.methods.length?p.methods.join(', '):'[] = every method'} · allowance ${allowance}`;
 }
+const keyItems=(inv,checked)=>inv.keys.map(k=>`<li><code class="${k.risk}">${k.risk}</code> ${esc(k.publicKey)}${k.publicKey===checked?' <strong>(the key you checked)</strong>':''}${k.receiver?`<br><span class="hint">${esc(permissionText({receiver:k.receiver,methods:k.methods,allowanceYocto:k.allowanceYocto}))}</span>`:''}</li>`).join('');
+// Account only, no key: list every key worst first (the CLI's scan). No verdict, because there is no policy to judge against.
+function renderScan(inv,snapshot){
+  const r=$('result'); r.classList.add('fresh');
+  const ev=inv.evidence;
+  r.innerHTML=inv.status!=='REPORT'?`<div class="verdict"><span class="badge UNKNOWN">UNKNOWN</span><span class="meaning">${esc(inv.error)}</span></div>`:
+    `<p><strong>${esc(scanLine(inv))}</strong></p>${inv.note?`<p class="hint">${esc(inv.note)}</p>`:''}
+    <div class="scan"><ul>${keyItems(inv)}</ul></div>
+    <dl>${[['Account',ev.account+' ('+ev.network+')'],['Block height',ev.blockHeight],['Block hash',ev.blockHash],['Fetched at',ev.fetchedAt]].map(([k,v])=>`<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}</dl>
+    <p class="hint">${esc(inv.scope)} This is a list, not a verdict: paste one of these keys above with the contract, methods and allowance you approved to get PASS or FAIL.</p>
+    <div class="actions"><a class="link" id="dl" download="key-scope-evidence.json">Download evidence JSON</a></div>`;
+  if($('dl')) $('dl').href=URL.createObjectURL(new Blob([JSON.stringify(snapshot,null,2)+'\n'],{type:'application/json'}));
+  requestAnimationFrame(()=>r.classList.remove('fresh'));
+}
 function render(report,mode,policy,snapshot){
   const r=$('result'); r.classList.add('fresh');
   const ev=report.evidence;
@@ -125,7 +140,7 @@ function render(report,mode,policy,snapshot){
     <ul class="findings">${report.findings.map(f=>`<li><code>${esc(f.code)}</code> ${esc(f.message)}</li>`).join('')||'<li>No finding: the observed permission fits the policy.</li>'}</ul>
     ${rows.length?`<dl>${rows.map(([k,v])=>`<dt>${k}</dt><dd>${esc(v)}</dd>`).join('')}</dl>`:''}
     ${report.scope?`<p class="hint">${esc(report.scope)}</p>`:''}
-    ${line?`<details class="scan"><summary>${esc(line)}</summary><ul>${inv.keys.map(k=>`<li><code class="${k.risk}">${k.risk}</code> ${esc(k.publicKey)}${k.publicKey===policy.publicKey?' <strong>(the key you checked)</strong>':''}${k.receiver?`<br><span class="hint">${esc(permissionText({receiver:k.receiver,methods:k.methods,allowanceYocto:k.allowanceYocto}))}</span>`:''}</li>`).join('')}</ul><p class="hint">${esc(inv.scope)}</p></details>`:''}
+    ${line?`<details class="scan"><summary>${esc(line)}</summary><ul>${keyItems(inv,policy.publicKey)}</ul><p class="hint">${esc(inv.scope)}</p></details>`:''}
     ${snapshot?`<div class="actions"><a class="link" id="dl" download="key-scope-evidence.json">Download evidence JSON</a><a class="link" id="dlp" download="policy.json">Download policy JSON</a></div>`:''}`;
   if(snapshot){
     $('dl').href=URL.createObjectURL(new Blob([JSON.stringify(snapshot,null,2)+'\n'],{type:'application/json'}));
@@ -134,8 +149,8 @@ function render(report,mode,policy,snapshot){
   requestAnimationFrame(()=>r.classList.remove('fresh'));
 }
 async function check(mode){
-  let policy;
-  try{policy=policyFromForm(form())}catch(e){return render({status:'UNKNOWN',findings:[{code:'INVALID_POLICY',message:e.message}],evidence:null},mode)}
+  let policy; const scan=mode==='live'&&!$('publicKey').value.trim();
+  try{policy=scan?scanTarget(form()):policyFromForm(form())}catch(e){return render({status:'UNKNOWN',findings:[{code:'INVALID_POLICY',message:e.message}],evidence:null},mode)}
   for(const b of document.querySelectorAll('button')) b.disabled=true;
   try{
     let snapshot;
@@ -145,7 +160,7 @@ async function check(mode){
       if(!res.ok) throw Error('RPC HTTP '+res.status);
       snapshot=snapshotFrom(policy,await res.json());
     } else snapshot=await (await fetch('examples/testnet-snapshot.json',{cache:'no-store'})).json();
-    render(audit(snapshot,policy),mode,policy,snapshot);
+    scan?renderScan(inventory(snapshot),snapshot):render(audit(snapshot,policy),mode,policy,snapshot);
   }catch(e){render({status:'UNKNOWN',findings:[{code:'RPC_UNAVAILABLE',message:e.message}],evidence:null},mode)}
   finally{for(const b of document.querySelectorAll('button')) b.disabled=false}
 }
@@ -155,6 +170,7 @@ $('replay').addEventListener('click',()=>{if(!$('account').value) fill(EXAMPLE);
 // Shareable proof: ?demo=live or ?demo=replay fills the public example and runs it on load.
 const demo=new URLSearchParams(location.search).get('demo');
 if(demo==='live'||demo==='replay'){fill(EXAMPLE);check(demo)}
+if(demo==='scan'){fill({...EXAMPLE,publicKey:''});check('live')}
 </script>
 </body>
 </html>

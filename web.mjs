@@ -31,6 +31,13 @@ export function policyFromForm(f) {
   validatePolicy(policy);
   return policy;
 }
+// Scan needs no policy: only where to look. Validated because it comes straight from the form.
+export function scanTarget(f) {
+  const t={network:f.network,account:String(f.account).trim()};
+  if (!Object.hasOwn(ENDPOINTS,t.network)) throw Error('Unknown network');
+  if (t.account.length<2||t.account.length>64||!/^[a-z0-9]+(?:[._-][a-z0-9]+)*$/.test(t.account)) throw Error('Invalid account: type the account name, like my-agent.near');
+  return t;
+}
 // One line for the page: how many keys the account has and how many of each risk (zero counts left out). null when the inventory failed.
 export function scanLine(inv) {
   if (inv?.status!=='REPORT') return null;
